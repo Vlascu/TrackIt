@@ -1,8 +1,6 @@
 # WorkoutHistoryWeb
 Web app where you can track you gym workouts. [ work in progress ]
 
-# Spring Boot Project with PostgreSQL Integration
-
 This is a Spring Boot application integrated with PostgreSQL as the database.
 
 ---
