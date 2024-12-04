@@ -1,0 +1,13 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, white, #ffb950);
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding-bottom: 50px;
+    padding-top: 20px;
+}
