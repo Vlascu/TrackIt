@@ -7,6 +7,72 @@
     <link rel="stylesheet" href="home.css">
 </head>
 <body>
+    <nav class="navbar">
+        <div class="app-name">WorkoutHistory</div>
+        <div class="menu">
+            <button class="menu-icon" onclick="toggleDropdown()">☰</button>
+            <div id="dropdown-menu" class="dropdown hidden">
+                <a >Profile</a>
+                <a id="change-date-option">Change Date</a>
+                <a href="">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <input id="date-picker" type="date" class="hidden">
+
+    <div class="date">
+        <span id="current-date"></span>
+    </div>
+
+    <div class="center-button-container">
+        <button id="center-button" class="center-button">Add Workout</button>
+    </div>
+
+    <div class="list-view-container">
+        <button id="left-button" class="nav-button left" onclick="">&lt;</button>
+        <div id="list-view" class="list-view">
+
+        </div>
+        <button id="right-button" class="nav-button right" onclick="">&gt;</button>
+    </div>
+
+    <div id="workout-form" class="hidden">
+        <form id="form-content">
+            <label for="muscle-name">Muscle Name:</label>
+            <select id="muscle-name">
+                <option value="Chest">Chest</option>
+                <option value="Back">Back</option>
+                <option value="Legs">Legs</option>
+                <option value="Arms">Arms</option>
+                <option value="Shoulders">Shoulders</option>
+            </select>
+
+            <label for="exercise-name">Exercise Name:</label>
+            <select id="exercise-name">
+                <option value="Bench Press">Bench Press</option>
+                <option value="Deadlift">Deadlift</option>
+                <option value="Squats">Squats</option>
+                <option value="Pull-Ups">Pull-Ups</option>
+                <option value="Overhead Press">Overhead Press</option>
+            </select>
+
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" min="1" required>
+
+            <label for="reps">Reps:</label>
+            <input type="number" id="reps" min="1" required>
+
+            <ul id="sets-list" class="sets-list"></ul>
+
+            <div class="form-buttons">
+                <button type="button" id="add-set">Add Set</button>
+                <button type="button" id="save">Save</button>
+                <button type="button" id="cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
+
     <script src = 'home.js'></script>
 </body>
 </html>

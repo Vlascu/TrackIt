@@ -21,15 +21,18 @@ public class Workout {
     private int day;
     private int year;
 
+    private String sets;
+
     public Workout() {
 
     }
-    public Workout(AppUser appUser, String muscleGroup, String exerciseName, int day, int month, int year) {
+    public Workout(AppUser appUser, String muscleGroup, String exerciseName, int day, int month, int year, String sets) {
         this.appUser = appUser;
         this.muscleGroup = muscleGroup;
         this.exerciseName = exerciseName;
         this.day = day;
         this.month = month;
         this.year = year;
+        this.sets = sets;
     }
 }

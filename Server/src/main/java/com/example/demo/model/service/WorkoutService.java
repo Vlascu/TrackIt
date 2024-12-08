@@ -19,12 +19,12 @@ public class WorkoutService {
         this.workoutRepository = workoutRepository;
     }
 
-    public Optional<Workout> saveWorkout(AppUser appUser, String exerciseName, String muscleGroup, String date) {
+    public Optional<Workout> saveWorkout(AppUser appUser, String exerciseName, String muscleGroup, String date, String sets) {
         int[] dates = Arrays.stream(date.split("-"))
                 .mapToInt(Integer::parseInt)
                 .toArray();
 
-        Workout workout = new Workout(appUser, muscleGroup, exerciseName, dates[0], dates[1], dates[2]);
+        Workout workout = new Workout(appUser, muscleGroup, exerciseName, dates[0], dates[1], dates[2], sets);
 
         try {
             return Optional.of(workoutRepository.save(workout));
