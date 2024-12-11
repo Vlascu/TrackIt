@@ -1,12 +1,22 @@
-document.getElementById('register-form').addEventListener('submit', async function(e) {
+// DOM node references for registration form
+const registerForm = document.getElementById('register-form');
+const firstNameInput = document.getElementById('firstName');
+const lastNameInput = document.getElementById('lastName');
+const passwordInput = document.getElementById('password');
+const bodyWeightInput = document.getElementById('bodyWeight');
+const heightInput = document.getElementById('height');
+const ageInput = document.getElementById('age');
+
+// Event listener for the registration form submit
+registerForm.addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const password = document.getElementById('password').value;
-    const bodyWeight = document.getElementById('bodyWeight').value;
-    const height = document.getElementById('height').value;
-    const age = document.getElementById('age').value;
+    const firstName = firstNameInput.value;
+    const lastName = lastNameInput.value;
+    const password = passwordInput.value;
+    const bodyWeight = bodyWeightInput.value;
+    const height = heightInput.value;
+    const age = ageInput.value;
 
     const userData = {
         firstName: firstName,
@@ -34,8 +44,4 @@ document.getElementById('register-form').addEventListener('submit', async functi
         alert('Registration failed: ' + result.error);
         console.log('Registration failed: ' + result.error);
     }
-});
-
-document.getElementById('login-button').addEventListener('click', ()=> {
-    window.location.replace("login.html");
 });

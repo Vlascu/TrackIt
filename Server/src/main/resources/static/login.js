@@ -1,16 +1,10 @@
-document.getElementById('login-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
+const loginForm = document.getElementById('login-form');
+const firstNameInput = document.getElementById('firstName');
+const lastNameInput = document.getElementById('lastName');
+const passwordInput = document.getElementById('password');
+const registerButton = document.getElementById('register-button');
 
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const password = document.getElementById('password').value;
-
-    const loginData = {
-        firstName: firstName,
-        lastName: lastName,
-        password: password
-    };
-
+async function loginUser(loginData) {
     const response = await fetch('http://localhost:8080/user/login', {
         method: 'POST',
         headers: {
@@ -20,14 +14,32 @@ document.getElementById('login-form').addEventListener('submit', async function(
     });
 
     const result = await response.json();
+
     if (response.ok) {
-        alert('Login successful!');
-        window.location.replace("home.html")
+        return result;
     } else {
-        alert('Login failed: ' + result.error);
+        throw new Error(result.error);
+    }
+}
+
+loginForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const loginData = {
+        firstName: firstNameInput.value,
+        lastName: lastNameInput.value,
+        password: passwordInput.value
+    };
+
+    try {
+        await loginUser(loginData);
+        alert('Login successful!');
+        window.location.replace("home.html");
+    } catch (error) {
+        alert('Login failed: ' + error.message);
     }
 });
 
-document.getElementById('register-button').addEventListener('click', ()=> {
+registerButton.addEventListener('click', () => {
     window.location.replace("register.html");
 });
