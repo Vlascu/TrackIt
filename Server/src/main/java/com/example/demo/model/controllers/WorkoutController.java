@@ -1,7 +1,9 @@
 package com.example.demo.model.controllers;
 
 import com.example.demo.model.entities.AppUser;
+import com.example.demo.model.entities.Exercise;
 import com.example.demo.model.entities.Workout;
+import com.example.demo.model.service.ExerciseService;
 import com.example.demo.model.service.UserService;
 import com.example.demo.model.service.WorkoutService;
 import com.example.demo.model.utils.ObjectMapper;
@@ -22,11 +24,13 @@ import java.util.Optional;
 public class WorkoutController {
     private final UserService userService;
     private final WorkoutService workoutService;
+    private final ExerciseService exerciseService;
 
     @Autowired
-    WorkoutController(UserService userService, WorkoutService workoutService) {
+    WorkoutController(UserService userService, WorkoutService workoutService, ExerciseService exerciseService) {
         this.userService = userService;
         this.workoutService = workoutService;
+        this.exerciseService = exerciseService;
     }
 
     @PostMapping("/workout/save")
@@ -153,6 +157,31 @@ public class WorkoutController {
             }
 
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error occurred"));
+        }
+    }
+
+    @GetMapping("/workout/exercises")
+    public ResponseEntity<?> getExercisesByMuscleGroup(@RequestParam("muscleGroup") String muscleGroup) {
+        try{
+            Optional<List<Exercise>> result = exerciseService.getAllExercisesByMuscleGroup(muscleGroup);
+
+            if(result.isPresent()) {
+                Map<String, Object> exercises = new HashMap<>();
+
+                List<Exercise> exercisesList = result.get();
+
+                for (int index = 0; index < exercisesList.size(); index++) {
+                    exercises.put(String.valueOf(index), ObjectMapper.objectToMap(exercisesList.get(index)));
+                }
+
+                return ResponseEntity.ok().body(exercises);
+
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Couldn't find exercises from the muscle group: " + muscleGroup));
+            }
+        }catch (Exception e)
+        {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error occurred"));
         }
     }

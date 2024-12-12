@@ -4,17 +4,20 @@ let selectedSet = null;
 let selectedWorkoutId = "-1";
 let selectedWorkout = null;
 
-const left_date_button = document.getElementById('left-button');
-const right_date_button = document.getElementById('right-button');
-const change_date = document.getElementById('change-date-option');
-const date_picker = document.getElementById('date-picker');
-const save_workout = document.getElementById('save');
-const add_workout = document.getElementById('center-button');
-const cancel_add_workout = document.getElementById('cancel');
-const add_set_for_workout = document.getElementById('add-set');
-const workouts_list_view = document.getElementById('list-view');
-const workout_form = document.getElementById('workout-form');
+const leftDateButton = document.getElementById('left-button');
+const rightDateButton = document.getElementById('right-button');
+const dateChanger = document.getElementById('change-date-option');
+const datePicker = document.getElementById('date-picker');
+const saveWorkoutBtn = document.getElementById('save');
+const addWorkoutBtn = document.getElementById('center-button');
+const cancelAddWorkoutBtn = document.getElementById('cancel');
+const addSetWorkoutBtn = document.getElementById('add-set');
+const workoutsListView = document.getElementById('list-view');
+const addWorkoutForm = document.getElementById('workout-form');
 const formButtons = document.querySelector('.form-buttons');
+const muscleSelect = document.getElementById('muscle-name');
+const exerciseSelect = document.getElementById('exercise-name');
+const workoutSetsList = document.getElementById('sets-list');
 
 function toggleDropdown() {
     const dropdown = document.getElementById('dropdown-menu');
@@ -31,62 +34,68 @@ function formatDate(date) {
     return date.toLocaleDateString('en-US', options);
 }
 
-function updateDateDisplay() {
+async function updateDateDisplay() {
     document.getElementById('current-date').textContent = formatDate(currentDate);
     formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
 
-    HomeRequests.getWorkoutsByDate(formattedDate, workouts_list_view).finally();
+    await HomeRequests.getWorkoutsByDate(formattedDate, workoutsListView);
 }
 
-left_date_button.addEventListener('click', () => {
+leftDateButton.addEventListener('click', async() => {
     currentDate.setDate(currentDate.getDate() - 1);
-    updateDateDisplay();
+    await updateDateDisplay();
 });
 
-right_date_button.addEventListener('click', () => {
+rightDateButton.addEventListener('click', async() => {
     currentDate.setDate(currentDate.getDate() + 1);
-    updateDateDisplay();
+    await updateDateDisplay();
 });
 
-change_date.addEventListener('click', () => {
+dateChanger.addEventListener('click', () => {
     const datePicker = document.getElementById('date-picker');
     datePicker.value = currentDate.toISOString().split('T')[0];
     datePicker.classList.remove('hidden');
     datePicker.focus();
 });
 
-date_picker.addEventListener('change', (event) => {
+datePicker.addEventListener('change', async(event) => {
     const selectedDate = new Date(event.target.value);
     if (!isNaN(selectedDate)) {
         currentDate = selectedDate;
-        updateDateDisplay();
+        await updateDateDisplay();
     }
     event.target.classList.add('hidden');
 });
 
-add_workout.addEventListener('click', () => {
-   showWorkoutForm();
+addWorkoutBtn.addEventListener('click', () => {
+    showWorkoutForm();
 
-    save_workout.textContent = 'Save';
-    workout_form.dataset.id = "-1";
-    add_set_for_workout.textContent = 'Add Set';
+    saveWorkoutBtn.textContent = 'Save';
+    addWorkoutForm.dataset.id = "-1";
+    addSetWorkoutBtn.textContent = 'Add Set';
 });
 
-cancel_add_workout.addEventListener('click', () => {
+cancelAddWorkoutBtn.addEventListener('click', () => {
+    const selects = addWorkoutForm.querySelectorAll('select');
+
+    selects.forEach(select => {
+        select.selectedIndex = 0;
+    });
+
     hideWorkoutForm();
 });
 
-add_set_for_workout.addEventListener('click', () => {
+addSetWorkoutBtn.addEventListener('click', () => {
     const weight = document.getElementById('weight').value;
     const reps = document.getElementById('reps').value;
 
     if (weight && reps) {
 
-        if(add_set_for_workout.textContent === "Add Set") {
+        if (addSetWorkoutBtn.textContent === "Add Set") {
             const setItem = document.createElement('li');
             setItem.textContent = `Reps: ${reps} | Weight: ${weight} kg`;
-            document.getElementById('sets-list').appendChild(setItem);
-        } else if (add_set_for_workout.textContent === "Update Set" && selectedSet) {
+            workoutSetsList.appendChild(setItem);
+        } else if (addSetWorkoutBtn.textContent === "Update Set" && selectedSet) {
             selectedSet.textContent = `Reps: ${reps} | Weight: ${weight} kg`;
             selectedSet = null;
         }
@@ -102,10 +111,10 @@ function hideWorkoutForm() {
     document.getElementById('workout-form').classList.add('hidden');
 }
 
-save_workout.addEventListener('click', () => {
+saveWorkoutBtn.addEventListener('click', async () => {
     const muscle = document.getElementById('muscle-name').value.trim();
     const exercise = document.getElementById('exercise-name').value.trim();
-    const sets = Array.from(document.getElementById('sets-list').children).map((item) => {
+    const sets = Array.from(workoutSetsList.children).map((item) => {
         const [reps, weight] = item.textContent.trim().split('|').map((text) => text.split(':')[1].trim());
         const weightValue = weight.replace('kg', '').trim();
         return `${reps},${weightValue}`;
@@ -126,14 +135,14 @@ save_workout.addEventListener('click', () => {
         date: formattedDate,
     };
 
-    if (save_workout.textContent === "Save") {
-        HomeRequests.saveWorkout(workoutData, workouts_list_view).finally();
-    } else if (save_workout.textContent === "Update") {
-        add_set_for_workout.textContent = 'Add Set';
-        HomeRequests.updateWorkout(workoutData, workouts_list_view).finally();
+    if (saveWorkoutBtn.textContent === "Save") {
+        await HomeRequests.saveWorkout(workoutData, workoutsListView);
+    } else if (saveWorkoutBtn.textContent === "Update") {
+        addSetWorkoutBtn.textContent = 'Add Set';
+        await HomeRequests.updateWorkout(workoutData, workoutsListView);
     }
 
-    document.getElementById('sets-list').innerHTML = '';
+    workoutSetsList.innerHTML = '';
     hideWorkoutForm();
 });
 
@@ -141,15 +150,14 @@ function showWorkoutForm() {
     document.getElementById('workout-form').classList.remove('hidden');
 }
 
-if(workouts_list_view)
-{
-    workouts_list_view.addEventListener('click', (event)=> {
+if (workoutsListView) {
+    workoutsListView.addEventListener('click', (event) => {
         selectedWorkout = event.target.closest('.workouts-list-item');
         if (!selectedWorkout) return;
 
         showWorkoutForm();
 
-        workout_form.dataset.id = selectedWorkout.dataset.id;
+        addWorkoutForm.dataset.id = selectedWorkout.dataset.id;
         selectedWorkoutId = selectedWorkout.dataset.id;
 
         const [muscleGroup, exerciseName] = selectedWorkout.querySelector('strong').textContent.split(':').map(text => text.trim());
@@ -157,21 +165,21 @@ if(workouts_list_view)
 
         const sets = setsHtml.split('<br>').map(set => {
             const [reps, weight] = set.split('|').map(text => text.split(':')[1].trim());
-            return { reps, weight: weight.replace('kg', '').trim() };
+            return {reps, weight: weight.replace('kg', '').trim()};
         });
 
         document.getElementById('muscle-name').value = muscleGroup;
         document.getElementById('exercise-name').value = exerciseName;
 
-        const setsList = document.getElementById('sets-list');
+        const setsList = workoutSetsList;
         setsList.innerHTML = '';
-        sets.forEach(({ reps, weight }) => {
+        sets.forEach(({reps, weight}) => {
             const setItem = document.createElement('li');
             setItem.textContent = `Reps: ${reps} | Weight: ${weight} kg`;
             setsList.appendChild(setItem);
         });
 
-        save_workout.textContent = 'Update';
+        saveWorkoutBtn.textContent = 'Update';
 
         const weightInput = document.getElementById('weight');
         const repsInput = document.getElementById('reps');
@@ -182,37 +190,53 @@ if(workouts_list_view)
                 repsInput.value = reps;
                 weightInput.value = weight.replace('kg', '').trim();
 
-                add_set_for_workout.textContent = "Update Set";
+                addSetWorkoutBtn.textContent = "Update Set";
 
                 selectedSet = event.target;
+
+                addButton('Remove Set', 'remove-set', formButtons, 'click', (button) => {
+                    selectedSet.remove();
+
+                    button.remove();
+                });
             });
         });
 
-        const deleteButton = document.createElement('button');
+        addButton('Delete', 'delete', formButtons, 'click', async (button) => {
+            await HomeRequests.deleteWorkout(selectedWorkoutId);
 
-        deleteButton.textContent = 'Delete';
+            selectedWorkout.remove();
 
-        deleteButton.id = 'delete';
-
-        formButtons.appendChild(deleteButton);
-
-        deleteButton.addEventListener('click', ()=> {
-             HomeRequests.deleteWorkout(selectedWorkoutId).finally();
-
-             selectedWorkout.remove();
-
-             hideWorkoutForm();
+            button.remove();
+            workoutSetsList.innerHTML = '';
+            hideWorkoutForm();
         });
 
     })
 }
 
-window.onload = async function() {
+function addButton(textContent, id, parent, type, listener) {
+    const button = document.createElement('button');
+
+    button.textContent = textContent;
+
+    button.id = id;
+
+    parent.appendChild(button);
+
+    button.addEventListener(type, () => listener(button));
+}
+muscleSelect.addEventListener('change', async () => {
+    const selectedMuscle = muscleSelect.value;
+    await HomeRequests.getAllExercisesByMuscleGroup(selectedMuscle);
+});
+
+window.onload = async function () {
     const userId = await HomeRequests.getUserIdFromSession();
 
-    updateDateDisplay();
+    await updateDateDisplay();
 
-    HomeRequests.getWorkoutsByDate(formattedDate, workouts_list_view).finally();
+    await HomeRequests.getWorkoutsByDate(formattedDate, workoutsListView);
 
     if (userId === -1) {
         window.location.href = 'login.html';
@@ -221,7 +245,7 @@ window.onload = async function() {
     }
 };
 
-window.addEventListener('click', function(event) {
+window.addEventListener('click', function (event) {
     const dropdown = document.getElementById('dropdown-menu');
     const menuIcon = document.querySelector('.menu-icon');
 
@@ -230,7 +254,7 @@ window.addEventListener('click', function(event) {
     }
 });
 
-class HomeRequests{
+class HomeRequests {
     static appendToList(workout, view) {
         const workoutId = workout.id;
         const muscleGroup = workout.muscleGroup;
@@ -274,8 +298,8 @@ class HomeRequests{
 
     static async getUserIdFromSession() {
         const response = await fetch('http://localhost:8080/user/sessionId', {
-            method : 'GET'
-        } );
+            method: 'GET'
+        });
 
         const result = await response.json();
 
@@ -288,11 +312,11 @@ class HomeRequests{
 
     static async getWorkoutsByDate(date, view) {
         const response = await fetch(`http://localhost:8080/workout/alldate?date=${encodeURIComponent(date)}`, {
-            method : 'GET',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
-        } );
+        });
 
         const result = await response.json();
 
@@ -307,14 +331,40 @@ class HomeRequests{
         }
     }
 
+    static async getAllExercisesByMuscleGroup(muscleGroup) {
+        const response = await fetch(`http://localhost:8080/workout/exercises?muscleGroup=${encodeURIComponent(muscleGroup)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            exerciseSelect.innerHTML = '<option value="">Select an exercise</option>';
+
+            for (const [index, exerciseData] of Object.entries(result)) {
+                const option = document.createElement('option');
+
+                option.value = exerciseData.exerciseName;
+                option.textContent = exerciseData.exerciseName;
+
+                exerciseSelect.appendChild(option);
+            }
+        } else {
+            alert('Error fetching workouts: ' + result.error);
+        }
+    }
+
     static async saveWorkout(workout, view) {
         const response = await fetch('http://localhost:8080/workout/save', {
-            method : 'POST',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(workout)
-        } );
+        });
 
         const result = await response.json();
 
@@ -327,12 +377,12 @@ class HomeRequests{
 
     static async updateWorkout(workout) {
         const response = await fetch('http://localhost:8080/workout/update', {
-            method : 'PUT',
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(workout)
-        } );
+        });
 
         const result = await response.json();
 
@@ -345,11 +395,11 @@ class HomeRequests{
 
     static async deleteWorkout(workoutId) {
         const response = await fetch(`http://localhost:8080/workout/deleteById?id=${encodeURIComponent(workoutId)}`, {
-            method : 'DELETE',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             }
-        } );
+        });
 
         const result = await response.json();
 
