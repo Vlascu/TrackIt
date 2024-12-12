@@ -1,5 +1,8 @@
 let currentDate = new Date();
 let formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
+let selectedSet = null;
+let selectedWorkoutId = "-1";
+let selectedWorkout = null;
 
 const left_date_button = document.getElementById('left-button');
 const right_date_button = document.getElementById('right-button');
@@ -10,6 +13,8 @@ const add_workout = document.getElementById('center-button');
 const cancel_add_workout = document.getElementById('cancel');
 const add_set_for_workout = document.getElementById('add-set');
 const workouts_list_view = document.getElementById('list-view');
+const workout_form = document.getElementById('workout-form');
+const formButtons = document.querySelector('.form-buttons');
 
 function toggleDropdown() {
     const dropdown = document.getElementById('dropdown-menu');
@@ -30,7 +35,7 @@ function updateDateDisplay() {
     document.getElementById('current-date').textContent = formatDate(currentDate);
     formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
 
-    HomeRequests.getWorkoutsByDate(formattedDate, workouts_list_view).catch(error => {alert("Error when getting workouts: " + error)})
+    HomeRequests.getWorkoutsByDate(formattedDate, workouts_list_view).finally();
 }
 
 left_date_button.addEventListener('click', () => {
@@ -60,11 +65,15 @@ date_picker.addEventListener('change', (event) => {
 });
 
 add_workout.addEventListener('click', () => {
-    document.getElementById('workout-form').classList.remove('hidden');
+   showWorkoutForm();
+
+    save_workout.textContent = 'Save';
+    workout_form.dataset.id = "-1";
+    add_set_for_workout.textContent = 'Add Set';
 });
 
 cancel_add_workout.addEventListener('click', () => {
-    document.getElementById('workout-form').classList.add('hidden');
+    hideWorkoutForm();
 });
 
 add_set_for_workout.addEventListener('click', () => {
@@ -72,9 +81,15 @@ add_set_for_workout.addEventListener('click', () => {
     const reps = document.getElementById('reps').value;
 
     if (weight && reps) {
-        const setItem = document.createElement('li');
-        setItem.textContent = `Reps: ${reps} | Weight: ${weight} kg`;
-        document.getElementById('sets-list').appendChild(setItem);
+
+        if(add_set_for_workout.textContent === "Add Set") {
+            const setItem = document.createElement('li');
+            setItem.textContent = `Reps: ${reps} | Weight: ${weight} kg`;
+            document.getElementById('sets-list').appendChild(setItem);
+        } else if (add_set_for_workout.textContent === "Update Set" && selectedSet) {
+            selectedSet.textContent = `Reps: ${reps} | Weight: ${weight} kg`;
+            selectedSet = null;
+        }
 
         document.getElementById('weight').value = '';
         document.getElementById('reps').value = '';
@@ -82,6 +97,10 @@ add_set_for_workout.addEventListener('click', () => {
         alert('Please fill in the set details.');
     }
 });
+
+function hideWorkoutForm() {
+    document.getElementById('workout-form').classList.add('hidden');
+}
 
 save_workout.addEventListener('click', () => {
     const muscle = document.getElementById('muscle-name').value.trim();
@@ -100,24 +119,100 @@ save_workout.addEventListener('click', () => {
     //todo: more validation
 
     const workoutData = {
+        id: selectedWorkoutId,
         muscleGroup: muscle,
         exerciseName: exercise,
         sets: sets,
         date: formattedDate,
     };
 
-    HomeRequests.saveWorkout(workoutData, workouts_list_view).catch(error => {alert("Error when saving: " + error)});
+    if (save_workout.textContent === "Save") {
+        HomeRequests.saveWorkout(workoutData, workouts_list_view).finally();
+    } else if (save_workout.textContent === "Update") {
+        add_set_for_workout.textContent = 'Add Set';
+        HomeRequests.updateWorkout(workoutData, workouts_list_view).finally();
+    }
 
     document.getElementById('sets-list').innerHTML = '';
-    document.getElementById('workout-form').classList.add('hidden');
+    hideWorkoutForm();
 });
+
+function showWorkoutForm() {
+    document.getElementById('workout-form').classList.remove('hidden');
+}
+
+if(workouts_list_view)
+{
+    workouts_list_view.addEventListener('click', (event)=> {
+        selectedWorkout = event.target.closest('.workouts-list-item');
+        if (!selectedWorkout) return;
+
+        showWorkoutForm();
+
+        workout_form.dataset.id = selectedWorkout.dataset.id;
+        selectedWorkoutId = selectedWorkout.dataset.id;
+
+        const [muscleGroup, exerciseName] = selectedWorkout.querySelector('strong').textContent.split(':').map(text => text.trim());
+        const setsHtml = selectedWorkout.querySelector('div').innerHTML;
+
+        const sets = setsHtml.split('<br>').map(set => {
+            const [reps, weight] = set.split('|').map(text => text.split(':')[1].trim());
+            return { reps, weight: weight.replace('kg', '').trim() };
+        });
+
+        document.getElementById('muscle-name').value = muscleGroup;
+        document.getElementById('exercise-name').value = exerciseName;
+
+        const setsList = document.getElementById('sets-list');
+        setsList.innerHTML = '';
+        sets.forEach(({ reps, weight }) => {
+            const setItem = document.createElement('li');
+            setItem.textContent = `Reps: ${reps} | Weight: ${weight} kg`;
+            setsList.appendChild(setItem);
+        });
+
+        save_workout.textContent = 'Update';
+
+        const weightInput = document.getElementById('weight');
+        const repsInput = document.getElementById('reps');
+
+        setsList.querySelectorAll('li').forEach((setItem) => {
+            setItem.addEventListener('click', (event) => {
+                const [reps, weight] = setItem.textContent.split('|').map(text => text.split(':')[1].trim());
+                repsInput.value = reps;
+                weightInput.value = weight.replace('kg', '').trim();
+
+                add_set_for_workout.textContent = "Update Set";
+
+                selectedSet = event.target;
+            });
+        });
+
+        const deleteButton = document.createElement('button');
+
+        deleteButton.textContent = 'Delete';
+
+        deleteButton.id = 'delete';
+
+        formButtons.appendChild(deleteButton);
+
+        deleteButton.addEventListener('click', ()=> {
+             HomeRequests.deleteWorkout(selectedWorkoutId).finally();
+
+             selectedWorkout.remove();
+
+             hideWorkoutForm();
+        });
+
+    })
+}
 
 window.onload = async function() {
     const userId = await HomeRequests.getUserIdFromSession();
 
     updateDateDisplay();
 
-    HomeRequests.getWorkoutsByDate(formattedDate, workouts_list_view).catch(error => {alert("Error when getting workouts: " + error)})
+    HomeRequests.getWorkoutsByDate(formattedDate, workouts_list_view).finally();
 
     if (userId === -1) {
         window.location.href = 'login.html';
@@ -136,7 +231,8 @@ window.addEventListener('click', function(event) {
 });
 
 class HomeRequests{
-    static append_to_list(workout, view) {
+    static appendToList(workout, view) {
+        const workoutId = workout.id;
         const muscleGroup = workout.muscleGroup;
         const exerciseName = workout.exerciseName;
         const sets = workout.sets.split('|');
@@ -147,7 +243,8 @@ class HomeRequests{
         }).join('<br>');
 
         const workoutItem = document.createElement('div');
-        workoutItem.classList.add('list-item');
+        workoutItem.dataset.id = workoutId;
+        workoutItem.classList.add('workouts-list-item');
         workoutItem.innerHTML = `
             <strong>${muscleGroup}: ${exerciseName}</strong>
             <div>${formattedSets}</div>
@@ -155,6 +252,26 @@ class HomeRequests{
 
         view.appendChild(workoutItem);
     }
+
+    static updateList(workout) {
+        const workoutId = workout.id;
+        const muscleGroup = workout.muscleGroup;
+        const exerciseName = workout.exerciseName;
+        const sets = workout.sets.split('|');
+
+        const formattedSets = sets.map(set => {
+            const [reps, weight] = set.split(',');
+            return `Reps: ${reps} | Weight: ${weight} kg`;
+        }).join('<br>');
+
+        if (selectedWorkout) {
+
+            selectedWorkout.dataset.id = workoutId;
+            selectedWorkout.querySelector('strong').textContent = `${muscleGroup}: ${exerciseName}`;
+            selectedWorkout.querySelector('div').innerHTML = formattedSets;
+        }
+    }
+
     static async getUserIdFromSession() {
         const response = await fetch('http://localhost:8080/user/sessionId', {
             method : 'GET'
@@ -183,7 +300,7 @@ class HomeRequests{
             view.innerHTML = '';
 
             for (const [index, workout] of Object.entries(result)) {
-                HomeRequests.append_to_list(workout, view);
+                HomeRequests.appendToList(workout, view);
             }
         } else {
             alert('Error fetching workouts: ' + result.error);
@@ -202,9 +319,44 @@ class HomeRequests{
         const result = await response.json();
 
         if (response.ok) {
-            HomeRequests.append_to_list(result, view)
+            HomeRequests.appendToList(result, view)
         } else {
             alert('Workout save failed: ' + result.error);
+        }
+    }
+
+    static async updateWorkout(workout) {
+        const response = await fetch('http://localhost:8080/workout/update', {
+            method : 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(workout)
+        } );
+
+        const result = await response.json();
+
+        if (response.ok) {
+            HomeRequests.updateList(result)
+        } else {
+            alert('Workout save failed: ' + result.error);
+        }
+    }
+
+    static async deleteWorkout(workoutId) {
+        const response = await fetch(`http://localhost:8080/workout/deleteById?id=${encodeURIComponent(workoutId)}`, {
+            method : 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        } );
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("Workout deleted successfully");
+        } else {
+            alert('Workout delete failed: ' + result.error);
         }
     }
 }

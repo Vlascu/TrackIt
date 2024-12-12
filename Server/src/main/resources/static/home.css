@@ -126,7 +126,7 @@ body {
     background: transparent;
 }
 
-.list-item {
+.workouts-list-item {
     width: auto;
     height: auto;
     padding: 5px;
@@ -138,6 +138,7 @@ body {
     border: 1px solid #333;
     border-radius: 10px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
 }
 
 .nav-button {
@@ -206,6 +207,10 @@ body {
     padding: 5px;
     border-bottom: 1px solid #ddd;
 }
+.sets-list li:hover {
+    background-color: #969696;
+    cursor: pointer;
+}
 
 .sets-list {
     list-style-type: none;
@@ -236,4 +241,5 @@ body {
 
 .form-buttons button:hover {
     background-color: #b96f00;
+    cursor: pointer;
 }

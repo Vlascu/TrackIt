@@ -10,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import com.example.demo.model.utils.FrontWorkoutInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,23 +31,20 @@ public class WorkoutController {
 
     @PostMapping("/workout/save")
     public ResponseEntity<?> saveWorkout(@RequestBody Map<String, Object> body, HttpSession session) {
-        try
-        {
-            long userId =(Long) session.getAttribute("userId");
+        try {
+            long userId = (Long) session.getAttribute("userId");
 
-            String exerciseName = (String) body.get("exerciseName");
-            String muscleGroup = (String) body.get("muscleGroup");
-            String date = (String) body.get("date");
-            String sets = (String) body.get("sets");
+            FrontWorkoutInfo workoutInfo = getFrontWorkoutInfo(body);
 
             //TODO: validation
 
             Optional<AppUser> foundUser = userService.findUserById(userId);
 
-            if(foundUser.isPresent()) {
-                Optional<Workout> savedWorkout = workoutService.saveWorkout(foundUser.get(), exerciseName, muscleGroup, date, sets);
+            if (foundUser.isPresent()) {
+                Optional<Workout> savedWorkout = workoutService.saveWorkout(foundUser.get()
+                        , workoutInfo.exerciseName(), workoutInfo.muscleGroup(), workoutInfo.date(), workoutInfo.sets());
 
-                if(savedWorkout.isPresent()) {
+                if (savedWorkout.isPresent()) {
                     return ResponseEntity.ok().body(ObjectMapper.objectToMap(savedWorkout.get()));
                 } else {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Couldn't save workout"));
@@ -57,11 +52,60 @@ public class WorkoutController {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Couldn't find user with current session id"));
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error: " + e.getMessage()));
         }
 
+    }
+
+    @PutMapping("/workout/update")
+    public ResponseEntity<?> updateWorkout(@RequestBody Map<String, Object> body, HttpSession session) {
+        try {
+            long userId = (Long) session.getAttribute("userId");
+
+            Long workoutId = body.get("id") != null ? Long.parseLong((String) body.get("id")) : null;
+
+            FrontWorkoutInfo workoutInfo = getFrontWorkoutInfo(body);
+
+            // TODO: validation
+
+            Optional<AppUser> foundUser = userService.findUserById(userId);
+
+            if (foundUser.isPresent()) {
+                Optional<Workout> existingWorkout = workoutService.findWorkoutById(workoutId);
+
+                if (existingWorkout.isPresent() && existingWorkout.get().getAppUser().getId() == userId) {
+                    Workout workoutToUpdate = existingWorkout.get();
+                    workoutToUpdate.setExerciseName(workoutInfo.exerciseName());
+                    workoutToUpdate.setMuscleGroup(workoutInfo.muscleGroup());
+                    workoutToUpdate.setDate(workoutInfo.date());
+                    workoutToUpdate.setSets(workoutInfo.sets());
+
+                    Optional<Workout> updatedWorkout = workoutService.updateWorkout(workoutToUpdate);
+
+                    if (updatedWorkout.isPresent()) {
+                        return ResponseEntity.ok().body(ObjectMapper.objectToMap(updatedWorkout.get()));
+                    } else {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Couldn't update workout"));
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Workout not found or doesn't belong to the current user"));
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Couldn't find user with current session ID"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error: " + e.getMessage()));
+        }
+    }
+
+    private static FrontWorkoutInfo getFrontWorkoutInfo(Map<String, Object> body) {
+        String exerciseName = (String) body.get("exerciseName");
+        String muscleGroup = (String) body.get("muscleGroup");
+        String date = (String) body.get("date");
+        String sets = (String) body.get("sets");
+
+        return new FrontWorkoutInfo(exerciseName, muscleGroup, date, sets);
     }
 
     @GetMapping("/workout/alldate")
@@ -69,17 +113,15 @@ public class WorkoutController {
         try {
             long userId = (Long) httpSession.getAttribute("userId");
 
-            Optional<AppUser> foundUser = userService.findUserById(userId);
+            if (userId != -1) {
+                Optional<List<Workout>> foundWorkouts = workoutService.getAllWorkoutsByDate(date, userId);
 
-            if(foundUser.isPresent()) {
-                Optional<List<Workout>> foundWorkouts = workoutService.getAllWorkoutsByDate(date, foundUser.get());
-
-                if(foundWorkouts.isPresent()) {
+                if (foundWorkouts.isPresent()) {
                     Map<String, Object> workouts = new HashMap<>();
 
                     List<Workout> workoutsList = foundWorkouts.get();
 
-                    for(int index = 0; index < workoutsList.size(); index++) {
+                    for (int index = 0; index < workoutsList.size(); index++) {
                         workouts.put(String.valueOf(index), ObjectMapper.objectToMap(workoutsList.get(index)));
                     }
 
@@ -97,4 +139,21 @@ public class WorkoutController {
 
     }
 
+    @DeleteMapping("/workout/deleteById")
+    public ResponseEntity<?> deleteWorkoutById(@RequestParam("id") String id) {
+        try {
+            Long workoutId = id != null ? Long.parseLong(id) : null;
+
+            boolean deleteResult = workoutService.deleteWorkoutById(workoutId);
+
+            if(deleteResult) {
+                return ResponseEntity.ok().body(Map.of("response", "ok"));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Couldn't delete workout"));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error occurred"));
+        }
+    }
 }

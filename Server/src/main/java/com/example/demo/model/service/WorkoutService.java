@@ -33,15 +33,45 @@ public class WorkoutService {
         }
     }
 
-    public Optional<List<Workout>> getAllWorkoutsByDate(String date, AppUser appUser) {
+    public Optional<List<Workout>> getAllWorkoutsByDate(String date, long userId) {
         int[] dates = Arrays.stream(date.split("-"))
                 .mapToInt(Integer::parseInt)
                 .toArray();
 
         try {
-            return Optional.of(workoutRepository.findAllByDayAndMonthAndYearAndAppUser(dates[0], dates[1], dates[2], appUser));
+            return Optional.of(workoutRepository.findAllByDayAndMonthAndYearAndAppUserId(dates[0], dates[1], dates[2], userId));
         } catch (Exception e) {
             return Optional.empty();
         }
+    }
+
+    public Optional<Workout> findWorkoutById(Long workoutId) {
+        try {
+            return workoutRepository.findById(workoutId);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Workout> updateWorkout(Workout workoutToUpdate) {
+        try {
+            return Optional.of(workoutRepository.save(workoutToUpdate));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Workout> findWorkoutByIdAndUserId(Long workoutId, Long userId) {
+        try {
+            return workoutRepository.findByIdAndAppUserId(workoutId, userId);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public boolean deleteWorkoutById(Long workoutId) {
+        workoutRepository.deleteById(workoutId);
+
+        return findWorkoutById(workoutId).isEmpty();
     }
 }

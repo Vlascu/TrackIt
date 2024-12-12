@@ -3,6 +3,8 @@ package com.example.demo.model.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Arrays;
+
 @Data
 @Entity
 public class Workout {
@@ -34,5 +36,15 @@ public class Workout {
         this.month = month;
         this.year = year;
         this.sets = sets;
+    }
+
+    public void setDate(String date) {
+        int[] dates = Arrays.stream(date.split("-"))
+                .mapToInt(Integer::parseInt)
+                .toArray();
+
+        this.day = dates[0];
+        this.month = dates[1];
+        this.year = dates[2];
     }
 }
