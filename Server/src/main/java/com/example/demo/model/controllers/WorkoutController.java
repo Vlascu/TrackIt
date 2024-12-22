@@ -54,7 +54,7 @@ public class WorkoutController {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Couldn't save workout"));
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Couldn't find user with current session id"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Couldn't find user with current session id"));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error: " + e.getMessage()));
@@ -96,7 +96,7 @@ public class WorkoutController {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Workout not found or doesn't belong to the current user"));
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Couldn't find user with current session ID"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Couldn't find user with current session ID"));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error: " + e.getMessage()));
@@ -131,7 +131,7 @@ public class WorkoutController {
 
                     return ResponseEntity.ok().body(workouts);
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("info", "No workouts on this date"));
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("info", "No workouts on this date"));
                 }
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Couldn't find user with current session id"));
@@ -153,7 +153,7 @@ public class WorkoutController {
             if(deleteResult) {
                 return ResponseEntity.ok().body(Map.of("response", "ok"));
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Couldn't delete workout"));
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Couldn't delete workout"));
             }
 
         } catch (Exception e) {
@@ -178,7 +178,7 @@ public class WorkoutController {
                 return ResponseEntity.ok().body(exercises);
 
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Couldn't find exercises from the muscle group: " + muscleGroup));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Couldn't find exercises from the muscle group: " + muscleGroup));
             }
         }catch (Exception e)
         {

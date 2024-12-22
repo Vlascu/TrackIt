@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,15 +51,13 @@ public class UserController {
                     session.setAttribute("userId", result.get().getId());
                     return ResponseEntity.ok().body(Map.of("response", "ok"));
                 } else {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to save user"));
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Failed to save user"));
                 }
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "An unexpected error occurred"));
         }
     }
-
-    //sa mut logica de aici in service ?
 
     @PostMapping("/user/login")
     public ResponseEntity<?> login(@RequestBody Map<String, Object> reqBody, HttpSession session) {
@@ -79,7 +78,7 @@ public class UserController {
                 session.setAttribute("userId", result.get().getId());
                 return ResponseEntity.ok().body(Map.of("response", "ok"));
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "User not found"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found"));
             }
 
         } catch (Exception e) {
@@ -96,6 +95,12 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "No user ID in session"));
         }
+    }
+
+    @DeleteMapping("/user/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok().body(Map.of("response", "ok"));
     }
 
 }

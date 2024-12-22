@@ -1,4 +1,3 @@
-// DOM node references for registration form
 const registerForm = document.getElementById('register-form');
 const firstNameInput = document.getElementById('firstName');
 const lastNameInput = document.getElementById('lastName');
@@ -7,7 +6,6 @@ const bodyWeightInput = document.getElementById('bodyWeight');
 const heightInput = document.getElementById('height');
 const ageInput = document.getElementById('age');
 
-// Event listener for the registration form submit
 registerForm.addEventListener('submit', async function(e) {
     e.preventDefault();
 

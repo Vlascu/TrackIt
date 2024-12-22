@@ -1,7 +1,7 @@
 let currentDate = new Date();
 let formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
 let selectedSet = null;
-let selectedWorkoutId = "-1";
+let selectedWorkoutId = '-1';
 let selectedWorkout = null;
 
 const leftDateButton = document.getElementById('left-button');
@@ -18,6 +18,8 @@ const formButtons = document.querySelector('.form-buttons');
 const muscleSelect = document.getElementById('muscle-name');
 const exerciseSelect = document.getElementById('exercise-name');
 const workoutSetsList = document.getElementById('sets-list');
+const logout = document.getElementById('logout');
+const profile = document.getElementById('profile');
 
 function toggleDropdown() {
     const dropdown = document.getElementById('dropdown-menu');
@@ -40,13 +42,19 @@ async function updateDateDisplay() {
 
     await HomeRequests.getWorkoutsByDate(formattedDate, workoutsListView);
 }
+profile.addEventListener('click', async()=> {
+    window.location.replace('profile.html')
+})
+logout.addEventListener('click', async() => {
+    await HomeRequests.logout();
+})
 
-leftDateButton.addEventListener('click', async() => {
+leftDateButton.addEventListener('click', async () => {
     currentDate.setDate(currentDate.getDate() - 1);
     await updateDateDisplay();
 });
 
-rightDateButton.addEventListener('click', async() => {
+rightDateButton.addEventListener('click', async () => {
     currentDate.setDate(currentDate.getDate() + 1);
     await updateDateDisplay();
 });
@@ -58,8 +66,9 @@ dateChanger.addEventListener('click', () => {
     datePicker.focus();
 });
 
-datePicker.addEventListener('change', async(event) => {
+datePicker.addEventListener('change', async (event) => {
     const selectedDate = new Date(event.target.value);
+
     if (!isNaN(selectedDate)) {
         currentDate = selectedDate;
         await updateDateDisplay();
@@ -71,7 +80,7 @@ addWorkoutBtn.addEventListener('click', () => {
     showWorkoutForm();
 
     saveWorkoutBtn.textContent = 'Save';
-    addWorkoutForm.dataset.id = "-1";
+    addWorkoutForm.dataset.id = '-1';
     addSetWorkoutBtn.textContent = 'Add Set';
 });
 
@@ -91,11 +100,11 @@ addSetWorkoutBtn.addEventListener('click', () => {
 
     if (weight && reps) {
 
-        if (addSetWorkoutBtn.textContent === "Add Set") {
+        if (addSetWorkoutBtn.textContent === 'Add Set') {
             const setItem = document.createElement('li');
             setItem.textContent = `Reps: ${reps} | Weight: ${weight} kg`;
             workoutSetsList.appendChild(setItem);
-        } else if (addSetWorkoutBtn.textContent === "Update Set" && selectedSet) {
+        } else if (addSetWorkoutBtn.textContent === 'Update Set' && selectedSet) {
             selectedSet.textContent = `Reps: ${reps} | Weight: ${weight} kg`;
             selectedSet = null;
         }
@@ -135,9 +144,9 @@ saveWorkoutBtn.addEventListener('click', async () => {
         date: formattedDate,
     };
 
-    if (saveWorkoutBtn.textContent === "Save") {
+    if (saveWorkoutBtn.textContent === 'Save') {
         await HomeRequests.saveWorkout(workoutData, workoutsListView);
-    } else if (saveWorkoutBtn.textContent === "Update") {
+    } else if (saveWorkoutBtn.textContent === 'Update') {
         addSetWorkoutBtn.textContent = 'Add Set';
         await HomeRequests.updateWorkout(workoutData, workoutsListView);
     }
@@ -190,7 +199,7 @@ if (workoutsListView) {
                 repsInput.value = reps;
                 weightInput.value = weight.replace('kg', '').trim();
 
-                addSetWorkoutBtn.textContent = "Update Set";
+                addSetWorkoutBtn.textContent = 'Update Set';
 
                 selectedSet = event.target;
 
@@ -226,6 +235,7 @@ function addButton(textContent, id, parent, type, listener) {
 
     button.addEventListener(type, () => listener(button));
 }
+
 muscleSelect.addEventListener('change', async () => {
     const selectedMuscle = muscleSelect.value;
     await HomeRequests.getAllExercisesByMuscleGroup(selectedMuscle);
@@ -234,15 +244,15 @@ muscleSelect.addEventListener('change', async () => {
 window.onload = async function () {
     const userId = await HomeRequests.getUserIdFromSession();
 
-    await updateDateDisplay();
-
-    await HomeRequests.getWorkoutsByDate(formattedDate, workoutsListView);
-
     if (userId === -1) {
         window.location.href = 'login.html';
     } else {
         console.log('Logged in as user ID:', userId);
     }
+
+    await updateDateDisplay();
+
+    await HomeRequests.getWorkoutsByDate(formattedDate, workoutsListView);
 };
 
 window.addEventListener('click', function (event) {
@@ -263,7 +273,7 @@ class HomeRequests {
 
         const formattedSets = sets.map(set => {
             const [reps, weight] = set.split(',');
-            return `Reps: ${reps} | Weight: ${weight} kg`;
+            return `Weight: ${weight} | Reps: ${reps} kg`;
         }).join('<br>');
 
         const workoutItem = document.createElement('div');
@@ -271,7 +281,7 @@ class HomeRequests {
         workoutItem.classList.add('workouts-list-item');
         workoutItem.innerHTML = `
             <strong>${muscleGroup}: ${exerciseName}</strong>
-            <div>${formattedSets}</div>
+            <div class="sets-container">${formattedSets}</div>
             `;
 
         view.appendChild(workoutItem);
@@ -289,7 +299,6 @@ class HomeRequests {
         }).join('<br>');
 
         if (selectedWorkout) {
-
             selectedWorkout.dataset.id = workoutId;
             selectedWorkout.querySelector('strong').textContent = `${muscleGroup}: ${exerciseName}`;
             selectedWorkout.querySelector('div').innerHTML = formattedSets;
@@ -404,9 +413,20 @@ class HomeRequests {
         const result = await response.json();
 
         if (response.ok) {
-            alert("Workout deleted successfully");
+            alert('Workout deleted successfully');
         } else {
             alert('Workout delete failed: ' + result.error);
         }
+    }
+
+    static async logout() {
+        const response = fetch('http://localhost:8080/user/logout', {
+            method: 'DELETE',
+            credentials: 'include'
+        }).then(() => {
+            window.location.replace("login.html");
+        }).catch((error) => {
+            alert("Something went wrong when logging out: " + error);
+        })
     }
 }
