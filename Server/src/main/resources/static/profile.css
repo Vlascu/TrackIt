@@ -24,6 +24,7 @@ body {
 .app-name {
     font-size: 1.5em;
     font-weight: bold;
+    padding-left: 20px;
 }
 
 .menu {
@@ -82,4 +83,63 @@ body {
 .profile-card p {
     margin: 5px 0;
     font-size: 16px;
+}
+
+.chart-container {
+    margin-top: 20px;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#update-weight-btn {
+    background-color: #ffb950;
+    color: white;
+}
+
+#update-weight-btn:hover {
+    background-color: #b96f00;
+}
+
+#weight-input-container button {
+    margin: 5px;
+}
+
+#weight-input-container button:first-child {
+    background-color: #ffb950;
+    color: white;
+}
+
+#weight-input-container button:first-child:hover {
+    background-color: #b96f00;
+}
+
+#weight-input-container button:last-child {
+    background-color: #dc3545;
+    color: white;
+}
+
+#weight-input-container button:last-child:hover {
+    background-color: #c82333;
+}
+
+#new-weight-input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 120px;
+    margin-right: 10px;
+    box-sizing: border-box;
 }

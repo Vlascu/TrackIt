@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface WorkoutRepository extends CrudRepository<Workout, Long> {
-    List<Workout> findAllByDayAndMonthAndYearAndAppUserId(int day, int month, int year, long userId);
+    Optional<List<Workout>> findAllByDayAndMonthAndYearAndAppUserId(int day, int month, int year, long userId);
 
     Optional<Workout> findByIdAndAppUserId(Long workoutId, Long userId);
 }

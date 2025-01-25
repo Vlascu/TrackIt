@@ -18,7 +18,7 @@ async function loginUser(loginData) {
     if (response.ok) {
         return result;
     } else {
-        throw new Error(result.error);
+        alert(result.error);
     }
 }
 

@@ -1,6 +1,7 @@
 package com.example.demo.model.utils;
 
 import com.example.demo.model.entities.Workout;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -24,5 +25,14 @@ public class ObjectMapper {
             }
         }
         return map;
+    }
+
+    public static WorkoutInfo mapReqBodyToWorkoutInfo(@RequestBody Map<String, Object> body) {
+        String exerciseName = (String) body.get("exerciseName");
+        String muscleGroup = (String) body.get("muscleGroup");
+        String date = (String) body.get("date");
+        String sets = (String) body.get("sets");
+
+        return new WorkoutInfo(exerciseName, muscleGroup, date, sets);
     }
 }

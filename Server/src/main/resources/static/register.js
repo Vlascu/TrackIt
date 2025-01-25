@@ -5,6 +5,7 @@ const passwordInput = document.getElementById('password');
 const bodyWeightInput = document.getElementById('bodyWeight');
 const heightInput = document.getElementById('height');
 const ageInput = document.getElementById('age');
+const loginButton = document.getElementById("login-button");
 
 registerForm.addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -42,4 +43,8 @@ registerForm.addEventListener('submit', async function(e) {
         alert('Registration failed: ' + result.error);
         console.log('Registration failed: ' + result.error);
     }
+});
+
+loginButton.addEventListener('click', () => {
+    window.location.replace("login.html");
 });
