@@ -1,9 +1,9 @@
 <h1>WorkoutHistory</h1>
 <form id="login-form" (ngSubmit)="onSubmit()" autocomplete="off">
-    <input type="text" [(ngModel)]="loginData.firstName" name="firstName" placeholder="First Name" required autocomplete="username"><br>
-    <input type="text" [(ngModel)]="loginData.lastName" name="lastName" placeholder="Last Name" required autocomplete="username"><br>
-    <input type="password" [(ngModel)]="loginData.password" name="password" placeholder="Password" required autocomplete="current-password"><br>
-    <button class="primary-btn" type="submit">Login</button>
+    <input type="text" [(ngModel)]="loginData.firstName" name="firstName" placeholder="First Name" required autocomplete="username" data-testid="first-name-input" ><br>
+    <input type="text" [(ngModel)]="loginData.lastName" name="lastName" placeholder="Last Name" required autocomplete="username" data-testid="last-name-input" ><br>
+    <input type="password" [(ngModel)]="loginData.password" name="password" placeholder="Password" required autocomplete="current-password" data-testid="password-input" ><br>
+    <button data-testid="login-button" class="primary-btn" type="submit">Login</button>
 
     <p>Don't have an account?</p>
     <button class="secondary-btn" type="button" (click)="onRegister()">Register</button>
