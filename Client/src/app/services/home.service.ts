@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class HomeService {
@@ -9,9 +9,12 @@ export class HomeService {
   constructor(private http: HttpClient) {}
 
   getUserIdFromSession(): Observable<number> {
-    return this.http.get<{ userId: number }>(`${this.baseUrl}/user/sessionId`, {withCredentials: true}).pipe(
+    return this.http.get<{ userId: number }>(`${this.baseUrl}/user/sessionId`, { withCredentials: true }).pipe(
       map(response => response.userId),
-      catchError(() => of(-1))
+      catchError((error) => {
+        console.error('Session ID Error:', error); 
+        return of(-1); 
+      })
     );
   }
 
@@ -20,10 +23,14 @@ export class HomeService {
   }
 
   getAllExercisesByMuscleGroup(muscleGroup: string): Observable<string[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/workout/exercises?muscleGroup=${encodeURIComponent(muscleGroup)}`, {withCredentials: true}).pipe(
-      map(exercises => exercises.map(e => e.exerciseName))
+    return this.http.get<{ [key: string]: { exerciseName: string; muscleGroup: string } }>(
+        `${this.baseUrl}/workout/exercises?muscleGroup=${encodeURIComponent(muscleGroup)}`, 
+        { withCredentials: true }
+    ).pipe(
+        map(response => Object.values(response)),
+        map(exercises => exercises.map(e => e.exerciseName))
     );
-  }
+}
 
   saveWorkout(workoutData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/workout/save`, workoutData, {withCredentials: true});
@@ -38,6 +45,7 @@ export class HomeService {
   }
 
   logout(): Observable<any> {
+    console.log("Logout called");
     return this.http.delete(`${this.baseUrl}/user/logout`, { withCredentials: true });
   }
 }

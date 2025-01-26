@@ -39,4 +39,12 @@ public class AppUser {
 
         this.bmi = (float) (bodyWeight / Math.pow(metricHeight, 2.0));
     }
+
+    public void setBodyWeight(float bodyWeight) {
+        this.bodyWeight = bodyWeight;
+
+        double metricHeight = this.height / 100;
+
+        this.bmi = (float) (bodyWeight / Math.pow(metricHeight, 2.0));
+    }
 }

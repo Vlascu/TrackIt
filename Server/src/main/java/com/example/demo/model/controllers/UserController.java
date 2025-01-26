@@ -31,9 +31,9 @@ public class UserController {
             String firstName = (String) reqBody.get("firstName");
             String lastName = (String) reqBody.get("lastName");
             String password = (String) reqBody.get("password");
-            Float bodyWeight = reqBody.get("bodyWeight") != null ? Float.parseFloat((String) reqBody.get("bodyWeight")) : null;
-            Float height = reqBody.get("height") != null ? Float.parseFloat((String) reqBody.get("height")) : null;
-            Integer age = reqBody.get("age") != null ? Integer.parseInt((String) reqBody.get("age")) : null;
+            Float bodyWeight = reqBody.get("bodyWeight") != null ? ((Number) reqBody.get("bodyWeight")).floatValue() : null;
+            Float height = reqBody.get("height") != null ? ((Number) reqBody.get("height")).floatValue() : null;
+            Integer age = reqBody.get("age") != null ? ((Number) reqBody.get("age")).intValue() : null;
 
             return userService.registerAndUpdateWeight(firstName, lastName, password, bodyWeight, height, age, session);
         } catch (Exception e) {
@@ -60,7 +60,7 @@ public class UserController {
         Object userId = session.getAttribute("userId");
 
         if (userId == null) {
-            return new ResponseEntity<>("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("User not logged in", HttpStatus.UNAUTHORIZED);
         }
 
         return ResponseEntity.ok(Map.of("userId", userId));
@@ -97,7 +97,7 @@ public class UserController {
     @PostMapping("/user/new_weight")
     public ResponseEntity<?> saveNewWeight(@RequestBody Map<String, Object> reqBody, HttpSession session) {
         try {
-            Float newWeight = reqBody.get("weight") != null ? Float.parseFloat((String) reqBody.get("weight")) : null;
+            Float newWeight = reqBody.get("weight") != null ? ((Number) reqBody.get("weight")).floatValue() : null;
             String date = (String) reqBody.get("date");
 
             return userService.saveNewWeight(newWeight, date, session);

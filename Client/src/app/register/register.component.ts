@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { RegisterService } from '../services/register.service';
 import { CommonModule} from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HomeService } from '../services/home.service';
+import { AuthStateService } from '../services/auth-state.service';
 
 @Component({
     standalone: true,
@@ -11,7 +13,7 @@ import { FormsModule } from '@angular/forms';
     styleUrls: ['./register.component.css'],
     imports: [CommonModule, FormsModule]
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit{
     userData = {
         firstName: '',
         lastName: '',
@@ -21,9 +23,36 @@ export class RegisterComponent {
         age: ''
     };
 
-    constructor(private registerService: RegisterService, private router: Router) {}
+    constructor(private registerService: RegisterService, 
+                private userService: HomeService, 
+                private router: Router,
+                private authState : AuthStateService) {}
+
+    ngOnInit() {
+        if(this.authState.getAlreadyLogged())
+            this.userService.logout().subscribe();
+    }
 
     onSubmit() {
+        const { bodyWeight, height, age } = this.userData;
+
+        const weight = parseFloat(bodyWeight);
+        const userHeight = parseFloat(height);
+        const userAge = parseInt(age, 10);
+
+        if (isNaN(weight) || weight < 0) {
+            alert('Body weight must be a non-negative number.');
+            return;
+        }
+        if (isNaN(userHeight) || userHeight < 0) {
+            alert('Height must be a non-negative number.');
+            return;
+        }
+        if (isNaN(userAge) || userAge < 0) {
+            alert('Age must be a non-negative number.');
+            return;
+        }
+
         this.registerService.registerUser(this.userData)
             .subscribe({
                 next: () => {

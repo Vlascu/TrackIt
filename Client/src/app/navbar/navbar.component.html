@@ -1,13 +1,14 @@
 <nav class="navbar">
   <div class="app-name">WorkoutHistory</div>
   <div class="menu">
-      <button class="menu-icon" (click)="toggleDropdown()">☰</button>
-      <div id="dropdown-menu" 
-           class="dropdown hidden" 
-           [class.hidden]="!isDropdownVisible">
-          <a (click)="navigateToProfile()">Profile</a>
-          <a (click)="dateClick()">Change Date</a>
-          <a (click)="logoutClick()">Logout</a>
-      </div>
+    <button class="menu-icon" (click)="toggleDropdown()">☰</button>
+    <div id="dropdown-menu" class="dropdown" [class.hidden]="!isDropdownVisible">
+      <a *ngIf="!isProfilePage()" (click)="navigateToProfile()">Profile</a>
+      <a *ngIf="!isProfilePage()" (click)="dateClick()">Change Date</a>
+      
+      <a *ngIf="isProfilePage()" (click)="navigateToHome()">Home</a>
+      
+      <a (click)="logoutClick()">Logout</a>
+    </div>
   </div>
 </nav>

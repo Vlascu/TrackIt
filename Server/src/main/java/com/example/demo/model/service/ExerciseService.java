@@ -26,7 +26,7 @@ public class ExerciseService {
         Optional<List<Exercise>> result = exerciseRepository.findAllByMuscleGroup(muscleGroup);
 
         if (result.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Couldn't find exercises from the muscle group: " + muscleGroup));
+            return new ResponseEntity<>("Couldn't find exercises from the muscle group: " + muscleGroup, HttpStatus.NOT_FOUND);
         }
 
         Map<String, Object> exercises = new HashMap<>();

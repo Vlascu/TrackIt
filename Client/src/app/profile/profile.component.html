@@ -1,1 +1,40 @@
-<p>profile works!</p>
+<div class = "page-wrapper">
+    <app-navbar 
+      (onLogoutClick)="logout()">
+    </app-navbar>
+    
+    <div class="profile-card">
+        <h2>User Profile</h2>
+        <p>First Name: {{ user.firstName }}</p>
+        <p>Last Name: {{ user.lastName }}</p>
+        <p>Height: {{ user.height }} cm</p>
+        <p>Bodyweight: {{ user.bodyWeight }} kg</p>
+        <p>Age: {{ user.age }}</p>
+        <p>BMI: {{ user.bmi }}</p>
+        <p>BMI Category: {{ user.bmiCategory }}</p>
+
+        <div class="chart-container">
+            <div id="weight-chart" *ngIf="chartOptions">
+                <apx-chart 
+                  [series]="chartOptions.series"
+                  [chart]="chartOptions.chart"
+                  [xaxis]="chartOptions.xaxis"
+                  [yaxis]="chartOptions.yaxis"
+                  [colors]="chartOptions.colors"
+                  [stroke]="chartOptions.stroke">
+                </apx-chart>
+              </div>
+        </div>
+
+        <button class="primary-btn" (click)="toggleWeightUpdate()" *ngIf="!showWeightUpdate">
+            Update Weight
+        </button>
+
+        <div *ngIf="showWeightUpdate" class="weight-input-container">
+            <input id = "new-weight-input" type="number" [(ngModel)]="newWeight" placeholder="New weight">
+            
+            <button class="primary-btn" (click)="saveWeight()">Save</button>
+            <button class="secondary-btn" (click)="toggleWeightUpdate()">Cancel</button>
+        </div>
+    </div>
+</div>

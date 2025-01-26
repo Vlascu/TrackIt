@@ -1,4 +1,4 @@
-<div class="overlay" *ngIf="showDatePicker"></div>
+<div class="overlay" *ngIf="showDatePicker || showForm"></div>
 
 <div class="page-wrapper">
   <app-navbar 
@@ -7,7 +7,6 @@
   </app-navbar>
 
   <div class="content-container">
-    <div class="workout-container">
       
       <div class="date-navigation">
         <button class="secondary-btn" (click)="changeDate(-1)">←</button>
@@ -30,21 +29,93 @@
   
       <div class="workout-list">
         <div *ngFor="let workout of workouts" class="workout-item" (click)="editWorkout(workout)">
-          <h3>{{ workout.muscleGroup }}: {{ workout.exerciseName }}</h3>
+          <h3>{{ workout.exerciseName }}</h3>
+          <h4>{{ workout.muscleGroup }}</h4>
           <div *ngFor="let set of workout.sets.split('|'); let i = index" class="set">
             Set {{ i + 1 }}: {{ set.split(',')[0] }} reps, {{ set.split(',')[1] }} kg
           </div>
         </div>
       </div>
-  
-      <div class="workout-form-container">
-        <app-workout-form 
-          *ngIf="showForm"
-          [workoutData]="selectedWorkout"
-          (close)="closeForm()">
-        </app-workout-form>
+
+      <div class="workout-form-container" [class.hidden]="!showForm">
+        <form [formGroup]="workoutForm" id="form-content">
+
+          <div class="form-inputs">
+            <div class="form-group">
+              <label>Muscle Name:</label>
+              <select 
+                id="muscle-name"
+                formControlName="muscleGroup"
+                aria-label="Select muscle group"
+                title="Muscle Group Selection"
+              >
+                <option value="">Select a muscle group</option>
+                <option *ngFor="let muscle of muscleGroups" [value]="muscle">
+                  {{ muscle }}
+                </option>
+              </select>
+            </div>
+          
+            <div class="form-group">
+              <label>Exercise Name:</label>
+              <select 
+                id="exercise-name"
+                formControlName="exerciseName"
+                aria-label="Select exercise"
+                title="Exercise Selection"
+              >
+                <option value="">Select an exercise</option>
+                <option *ngFor="let exercise of exercises" [value]="exercise">
+                  {{ exercise }}
+                </option>
+              </select>
+            </div>
+          
+            <div class="form-group">
+              <label>Weight (kg):</label>
+              <input id="weight" type="number" formControlName="weight" required 
+                     placeholder="Enter weight in kilograms" aria-label="Weight input">
+            </div>
+          
+            <div class="form-group">
+              <label>Reps:</label>
+              <input id="reps" type="number" formControlName="reps" required 
+                     placeholder="Enter number of repetitions" aria-label="Repetitions input">
+            </div>
+          </div>
+          
+          
+          <ul class="sets-list">
+            <li *ngFor="let set of sets; let i = index" (click)="editSet(i)">
+              Reps: {{ set.reps }} | Weight: {{ set.weight }} kg
+            </li>
+          </ul>
+      
+          <div class="form-buttons">
+            <button class ="primary-btn" type="button" (click)="addSet()">
+              {{ selectedSetIndex !== null ? 'Update' : 'Add' }} Set
+            </button>
+
+            <button class ="primary-btn" type="button"
+            [class.delete-btn]="selectedSetIndex !== null"
+            (click)="selectedSetIndex !== null ? removeSet($event, selectedSetIndex) : saveWorkout()">
+              {{ selectedSetIndex !== null ? 'Delete Set' : 'Save' }}
+            </button>
+
+            <button class ="primary-btn" type="button" (click)="closeForm()">Cancel</button>
+
+            <button *ngIf="selectedWorkout" 
+              class="delete-btn" 
+              type="button" 
+              (click)="deleteWorkout(selectedWorkout.id)">
+              Delete
+            </button>
+
+          </div>
+
+        </form>
       </div>
-    </div>
+
   </div> 
   
 </div>

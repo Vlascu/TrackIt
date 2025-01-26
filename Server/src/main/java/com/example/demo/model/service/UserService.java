@@ -129,8 +129,8 @@ public class UserService {
         return new ResponseEntity<>("Can't find current user", HttpStatus.NOT_FOUND);
     }
 
+    @Transactional
     public ResponseEntity<?> saveNewWeight(Float newWeight, String date, HttpSession session) {
-        //TODO: also update the current user weight and bmi
         Object userId = session.getAttribute("userId");
 
         int[] dates = Arrays.stream(date.split("-"))
@@ -151,14 +151,24 @@ public class UserService {
             return new ResponseEntity<>("Can't find current user", HttpStatus.NOT_FOUND);
         }
 
-        WeightUpdate update = new WeightUpdate(user.get(), dates[1], dates[0], dates[2], newWeight);
+        AppUser existingUser = user.get();
+        existingUser.setBodyWeight(newWeight);
 
-        Optional<WeightUpdate> result = weightUpdateService.save(update);
+        WeightUpdate update = new WeightUpdate(existingUser, dates[1], dates[0], dates[2], newWeight);
 
-        if (result.isPresent()) {
-            return ResponseEntity.ok(ObjectMapper.objectToMap(result.get()));
+        Optional<WeightUpdate> savedWeight = weightUpdateService.save(update);
+
+        Optional<AppUser> savedUser = save(existingUser);
+
+        if (savedUser.isEmpty()) {
+            return new ResponseEntity<>("Something went wrong when updating the user with the new weight", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Failed to save weight update"));
+        if (savedWeight.isEmpty()) {
+            return new ResponseEntity<>("Failed to save weight update", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return ResponseEntity.ok(ObjectMapper.objectToMap(savedWeight.get()));
+
     }
+
 }

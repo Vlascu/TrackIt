@@ -90,12 +90,11 @@ public class WorkoutService {
     }
 
     public ResponseEntity<?> updateWorkout(Map<String, Object> body, HttpSession session) {
-        Long workoutId = body.get("id") != null ? Long.parseLong((String) body.get("id")) : null;
+        Long workoutId = body.get("id") != null ? ((Number)body.get("id")).longValue() : null;
 
         WorkoutInfo workoutInfo = ObjectMapper.mapReqBodyToWorkoutInfo(body);
 
         long userId = (Long) session.getAttribute("userId");
-        // TODO: validation
 
         if (workoutId == null) {
             return new ResponseEntity<>("Null workout id from client", HttpStatus.BAD_REQUEST);

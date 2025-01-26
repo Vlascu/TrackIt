@@ -1,0 +1,72 @@
+app-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: #333;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow: visible !important; 
+}
+
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    }
+
+.profile-card {
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    height: auto;
+}
+
+.profile-card h2 {
+    margin-bottom: 20px;
+}
+
+.profile-card p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.chart-container {
+    margin-top: 10px;
+    max-height: 200px;
+    min-height: 100px;
+    margin-bottom: 10px;
+}
+
+#new-weight-input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 120px;
+    margin-right: 10px;
+    box-sizing: border-box;
+}
+
+.weight-input-container {
+    display: flex;
+    gap: 1rem; 
+    align-items: center;
+    margin-top: 1rem;
+}
+
+#weight-chart {
+    max-height: 100 px;
+}
+
+apx-chart  {
+    max-height: 100px;
+}
