@@ -1,5 +1,5 @@
 # WorkoutHistoryWeb
-Web app where you can track you gym workouts. [ work in progress ]
+Web app where you can track you gym workouts.
 
 This is a Spring Boot application integrated with PostgreSQL as the database.
 
