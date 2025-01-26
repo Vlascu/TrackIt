@@ -1,0 +1,51 @@
+<div class="overlay" *ngIf="showDatePicker"></div>
+
+<div class="page-wrapper">
+  <app-navbar 
+      (onChangeDateClick)="openDatePicker()"
+      (onLogoutClick)="logout()">
+  </app-navbar>
+
+  <div class="content-container">
+    <div class="workout-container">
+      
+      <div class="date-navigation">
+        <button class="secondary-btn" (click)="changeDate(-1)">←</button>
+        <h3>{{ formatDate(currentDate) }}</h3>
+        <button class="secondary-btn" (click)="changeDate(1)">→</button>
+      </div>
+      
+      <input #datePickerInput
+               id="date-picker"
+               type="date"
+               [class.hidden]="!showDatePicker"
+               (change)="handleDateSelection($event)"
+               (blur)="datePickerClosed()"
+               [value]="getFormattedDateForInput(currentDate)"
+               aria-label="Date Picker">
+
+      <div class="center-button-container">
+        <button class="secondary-btn" (click)="openWorkoutForm()">Add Workout</button>
+      </div>
+  
+      <div class="workout-list">
+        <div *ngFor="let workout of workouts" class="workout-item" (click)="editWorkout(workout)">
+          <h3>{{ workout.muscleGroup }}: {{ workout.exerciseName }}</h3>
+          <div *ngFor="let set of workout.sets.split('|'); let i = index" class="set">
+            Set {{ i + 1 }}: {{ set.split(',')[0] }} reps, {{ set.split(',')[1] }} kg
+          </div>
+        </div>
+      </div>
+  
+      <div class="workout-form-container">
+        <app-workout-form 
+          *ngIf="showForm"
+          [workoutData]="selectedWorkout"
+          (close)="closeForm()">
+        </app-workout-form>
+      </div>
+    </div>
+  </div> 
+  
+</div>
+

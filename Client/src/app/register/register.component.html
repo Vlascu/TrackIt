@@ -1,0 +1,12 @@
+<h1>WorkoutHistory</h1>
+<form id = "register-form" (ngSubmit)="onSubmit()" #registerForm="ngForm" autocomplete="off">
+    <input type="text" id="firstName" name="firstName" [(ngModel)]="userData.firstName" placeholder="First Name" required autocomplete="cc-off"><br>
+    <input type="text" id="lastName" name="lastName" [(ngModel)]="userData.lastName" placeholder="Last Name" required autocomplete="cc-off"><br>
+    <input type="password" id="password" name="password" [(ngModel)]="userData.password" placeholder="Password" required autocomplete="cc-off"><br>
+    <input type="number" id="bodyWeight" name="bodyWeight" [(ngModel)]="userData.bodyWeight" placeholder="Body Weight (kg)" required autocomplete="cc-off"><br>
+    <input type="number" id="height" name="height" [(ngModel)]="userData.height" placeholder="Height (cm)" required autocomplete="cc-off"><br>
+    <input type="number" id="age" name="age" [(ngModel)]="userData.age" placeholder="Age" required autocomplete="cc-off"><br>
+    <button class="primary-btn" type="submit">Register</button>
+    <p>Already registered?</p>
+    <button class="secondary-btn" type="button" (click)="onLogin()">Login</button>
+</form>

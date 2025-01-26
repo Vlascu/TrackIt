@@ -68,8 +68,12 @@ public class UserController {
 
     @DeleteMapping("/user/logout")
     public ResponseEntity<?> logout(HttpSession session) {
-        session.invalidate();
-        return ResponseEntity.ok("Session invalidated successfully");
+        try{
+            session.invalidate();
+            return ResponseEntity.ok(Map.of());
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/user/current-user")
