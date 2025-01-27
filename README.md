@@ -3,6 +3,17 @@ Web app where you can track you gym workouts.
 
 This is a Spring Boot application integrated with PostgreSQL as the database.
 
+Users can:
+- Record and view workouts.
+- Weight loss / increase performance over time.
+- Calculate their BMI.
+
+---
+
+# Architecture
+
+![image](https://github.com/user-attachments/assets/6c5e9be4-b3e9-4263-82f4-10e0a6a69bb2)
+
 ---
 
 ## Prerequisites
