@@ -41,7 +41,7 @@ Users can:
      Replace `postgres` with your administrator username.
    - Create a new database for the project:
      ```sql
-     CREATE DATABASE WorkoutHistoryWeb;
+     CREATE DATABASE TrackIt;
      ```
 
 ---
@@ -54,7 +54,7 @@ Users can:
 2. **Update the PostgreSQL Configuration**
    - Modify the file to include the PostgreSQL database details:
      ```properties
-     spring.datasource.url=jdbc:postgresql://localhost:5432/WorkoutHistoryWeb
+     spring.datasource.url=jdbc:postgresql://localhost:5432/TrackIt
      spring.datasource.username=your_username
      spring.datasource.password=your_password
      spring.jpa.hibernate.ddl-auto=update
@@ -74,7 +74,7 @@ Users can:
 1. **Clone the Repository (Optional)**
    - If the project is hosted on GitHub, clone it:
      ```bash
-     git clone https://github.com/your-username/your-repository.git
+     git clone https://github.com/Vlascu/TrackIt.git
      ```
    - Navigate to the project directory:
      ```bash
