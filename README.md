@@ -10,12 +10,6 @@ Users can:
 
 ---
 
-# Architecture
-
-![image](https://github.com/user-attachments/assets/6c5e9be4-b3e9-4263-82f4-10e0a6a69bb2)
-
----
-
 ## Prerequisites
 - Java 11 or higher
 - Maven 3.6 or higher
