@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WorkoutHistoryApp {
+public class TrackIt {
 
 	public static void main(String[] args) {
-		SpringApplication.run(WorkoutHistoryApp.class, args);
+		SpringApplication.run(TrackIt.class, args);
 	}
 
 }

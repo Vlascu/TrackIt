@@ -55,6 +55,7 @@ public class UserController {
         }
     }
 
+    //filters for check on every method like Guard
     @GetMapping("/user/sessionId")
     public ResponseEntity<?> getSessionUserId(HttpSession session) {
         Object userId = session.getAttribute("userId");
