@@ -88,7 +88,7 @@ Users can:
      ```
 
 3. **Run the Application**
-   - Start the Spring Boot application:
+   - Start the Server Spring Boot application:
      ```bash
      mvn spring-boot:run
      ```
@@ -96,8 +96,7 @@ Users can:
      ```bash
      java -jar target/your-application.jar
      ```
-
----
-
-## Verify the Setup
-- Open a browser and navigate to the application URL: http://localhost:8080/register.html
+   - Open the Angular Client app and run:
+     ```bash
+     ng serve -o
+     ```
